@@ -172,7 +172,7 @@ import { FormsModule } from '@angular/forms';
                 (click)="resetArticle()"
                 class="text-white bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium  text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Efface
+                Reset
               </button>
             </div>
           </form>
