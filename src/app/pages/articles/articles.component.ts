@@ -162,17 +162,16 @@ import { FormsModule } from '@angular/forms';
             <div class="flex gap-4 mt-8">
               <button
                 (click)="saveArticle()"
-                [disabled]="!articleForm.valid || laodingArticle()"
                 class="text-white bg-blue-400 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Sauvegarde
+                Save
               </button>
 
               <button
                 (click)="resetArticle()"
                 class="text-white bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium  text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Reset
+                Clear
               </button>
             </div>
           </form>

@@ -148,14 +148,14 @@ import { FormsModule } from '@angular/forms';
                 [disabled]="!productForm.valid || loadingProduct()"
                 class="text-white bg-blue-400 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Sauvegarde
+                Save
               </button>
 
               <button
                 (click)="resetProduct()"
                 class="text-white bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium  text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Cancel
+                Clear
               </button>
             </div>
           </form>
@@ -183,7 +183,7 @@ import { FormsModule } from '@angular/forms';
                 (click)="addCat()"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium  text-sm w-full px-5 py-2.5 text-center cursor-pointer"
               >
-                Sauvegarde
+                Save
               </button>
             </div>
           </form>
@@ -240,17 +240,26 @@ import { FormsModule } from '@angular/forms';
           } @if(!fetchingCat() && categories().length < 1){
           <p class="text-center italic ">No categories yet</p>
           } @if(!fetchingCat() && categories().length > 0){
-          <div class="flex gap-4">
+          <div class="flex flex-col gap-2 mt-2">
             @for (category of categories(); track category.id) {
-            <div class="border py-1 px-2 ">
+            <div class="border py-1 px-2 w-full">
               <div class="flex justify-between gap-4">
                 <p>{{ category.name }}</p>
-                <p
-                  (click)="deleteCat(category.id!)"
-                  class="text-xs cursor-pointer"
-                >
-                  x
-                </p>
+
+                <div class="flex justify-end gap-2 text-xs mt-2">
+                  <p
+                    (click)="editCat(category)"
+                    class="cursor-pointer underline "
+                  >
+                    Edit
+                  </p>
+                  <p
+                    (click)="deleteCat(category.id!)"
+                    class="cursor-pointer underline text-red-500"
+                  >
+                    Delete
+                  </p>
+                </div>
               </div>
             </div>
             }
@@ -258,7 +267,7 @@ import { FormsModule } from '@angular/forms';
           }
           <div class="mt-2">
             <p
-              (click)="setActiveForm(2)"
+              (click)="newCat()"
               class="cursor-pointer underline text-xs text-blue-500"
             >
               Add Category
@@ -287,6 +296,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.activeForm.set(num);
     this.leftForm.set(true);
   }
+  editingCat = signal(false);
   categories = signal<Category[]>([]);
   products = signal<Product[]>([]);
 
@@ -375,21 +385,55 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addCat() {
     this.loadingCat.set(true);
-    this.subs.add(
-      this.apiService.addCategory(this.category).subscribe({
-        next: (category) => {
-          this.toastr.success('Successful');
-          this.categories.set([...this.categories(), category]);
-          this.category.name = '';
-          this.loadingCat.set(false);
-        },
-        error: (error) => {
-          this.loadingCat.set(false);
-          this.toastr.error('Failed!');
-          console.log(error);
-        },
-      })
-    );
+    if (this.editingCat()) {
+      this.subs.add(
+        this.apiService.editCategory(this.category).subscribe({
+          next: (updatedCat) => {
+            this.toastr.success('Successful');
+
+            const updatedList = this.categories().map((a) =>
+              a.id === updatedCat.id ? updatedCat : a
+            );
+            this.categories.set(updatedList);
+            this.category.name = '';
+            this.loadingCat.set(false);
+          },
+          error: (error) => {
+            this.loadingCat.set(false);
+            this.toastr.error('Failed!');
+            console.log(error);
+          },
+        })
+      );
+    } else {
+      this.subs.add(
+        this.apiService.addCategory(this.category).subscribe({
+          next: (category) => {
+            this.toastr.success('Successful');
+            this.categories.set([...this.categories(), category]);
+            this.category.name = '';
+            this.loadingCat.set(false);
+          },
+          error: (error) => {
+            this.loadingCat.set(false);
+            this.toastr.error('Failed!');
+            console.log(error);
+          },
+        })
+      );
+    }
+  }
+
+  editCat(cat: Category) {
+    this.setActiveForm(2);
+    this.category = cat;
+    this.editingCat.set(true);
+  }
+
+  newCat() {
+    this.category.name = '';
+    this.setActiveForm(2);
+    this.editingCat.set(false);
   }
 
   saveProduct() {

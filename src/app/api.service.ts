@@ -46,15 +46,22 @@ export class ApiService {
 
   editArticle(article: Article) {
     return this.http.put<Article>(
-      `${this.apiUrl}/article/${article.id}`,
+      `${this.apiUrl}/article/${article.id}/`,
       article
     );
   }
 
   editProduct(product: Product) {
     return this.http.put<Product>(
-      `${this.apiUrl}/product/${product.id}`,
+      `${this.apiUrl}/product/${product.id}/`,
       product
+    );
+  }
+
+  editCategory(category: Category) {
+    return this.http.put<Category>(
+      `${this.apiUrl}/category/${category.id}/`,
+      category
     );
   }
 }
